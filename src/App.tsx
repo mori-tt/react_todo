@@ -1,16 +1,13 @@
 import { useState } from "react";
 import "./App.css";
+import InputTodo from "./components/InputTodo";
+import IncompleteTodos from "./components/IncompleteTodos";
+import CompleteTodos from "./components/CompleteTodos";
 
 function App() {
   const [todoText, setTodoText] = useState<string>("");
-  const [incompleteTodos, setIncompleteTodos] = useState<string[]>([
-    "TODO1",
-    "TODO2",
-  ]);
-  const [completeTodos, setCompleteTodos] = useState<string[]>([
-    "TODO1 完了",
-    "TODO2 完了",
-  ]);
+  const [incompleteTodos, setIncompleteTodos] = useState<string[]>([]);
+  const [completeTodos, setCompleteTodos] = useState<string[]>([]);
 
   const onChangeTodoText = (event: React.ChangeEvent<HTMLInputElement>) =>
     setTodoText(event.target.value);
@@ -46,47 +43,26 @@ function App() {
     setCompleteTodos(newCompleteTodos);
     setIncompleteTodos(newIncompleteTodos);
   };
+
+  const isMaxLimitinCompleteTodos = completeTodos.length >= 5;
+
   return (
     <>
-      <div className="input-area">
-        <input
-          type="text"
-          placeholder="TODOを入力"
-          id="add-text"
-          value={todoText}
-          onChange={onChangeTodoText}
-        />
-        <button id="add-button" onClick={onClickAdd}>
-          追加
-        </button>
-      </div>
-      <div className="incomplete-area">
-        <p className="title">未完了のTODO</p>
-        <ul id="incomplete-list">
-          {incompleteTodos.map((todo, index) => (
-            <li key={todo}>
-              <div className="list-row">
-                <p className="todo-item">{todo}</p>
-                <button onClick={() => onClickComplete(index)}>完了</button>
-                <button onClick={() => onClickDelete(index)}>削除</button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="complete-area">
-        <p className="title">完了のTODO</p>
-        <ul id="complete-list">
-          {completeTodos.map((todo, index) => (
-            <li key={todo}>
-              <div className="list-row">
-                <p className="todo-item">{todo}</p>
-                <button onClick={() => onClickBack(index)}>戻す</button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <InputTodo
+        todoText={todoText}
+        onChange={onChangeTodoText}
+        onClick={onClickAdd}
+        disabled={isMaxLimitinCompleteTodos}
+      />
+      {isMaxLimitinCompleteTodos && (
+        <p style={{ color: "red" }}>登録できるTODOは5個までです</p>
+      )}
+      <IncompleteTodos
+        todos={incompleteTodos}
+        onClickComplete={onClickComplete}
+        onClickDelete={onClickDelete}
+      />
+      <CompleteTodos todos={completeTodos} onClickBack={onClickBack} />
     </>
   );
 }
